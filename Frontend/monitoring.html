@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Operasyon İzleme | İETT AYS</title></head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper">
+  <!-- Tüm iç sayfalarda kullanılan AdminLTE üst menü ve rol bazlı yan menü kabuğu. -->
+  <nav class="app-header navbar navbar-expand bg-body shadow-sm"><div class="container-fluid"><button class="btn btn-link nav-link" data-lte-toggle="sidebar"><i class="bi bi-list fs-4"></i></button><span class="navbar-text ms-2 fw-semibold">İETT Arıza Yönetim Sistemi</span><div class="ms-auto d-flex gap-3 align-items-center"><span id="current-user" class="small text-secondary">Oturum doğrulanıyor…</span><button id="logout-button" class="btn btn-outline-danger btn-sm">Çıkış</button></div></div></nav>
+  <aside class="app-sidebar sidebar-iett shadow" data-bs-theme="dark"><div class="sidebar-brand border-bottom"><a href="./index.html" class="brand-link text-decoration-none"><span class="brand-text fw-bold text-white">İETT <span class="brand-accent">AYS</span></span></a></div><div class="sidebar-wrapper"><nav class="mt-2"><ul id="application-navigation" class="nav sidebar-menu flex-column"></ul></nav></div></aside>
+
+  <main class="app-main">
+    <div class="app-content-header"><div class="container-fluid py-3"><h1 class="mb-1">Operasyon İzleme</h1><p class="text-secondary mb-0">Tekrarlayan arızalar ve araç sağlık puanları</p></div></div>
+    <div class="app-content"><div class="container-fluid">
+      <div id="page-error" class="alert alert-danger d-none"></div>
+      <!-- Özet kartları operasyonun dikkat gerektiren alanlarını tek bakışta gösterir. -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6"><div class="card h-100"><div class="card-body"><small class="text-secondary">Tekrarlayan arıza</small><div id="recurring-count" class="fs-3 fw-bold text-warning">0</div></div></div></div>
+        <div class="col-12 col-md-6"><div class="card h-100"><div class="card-body"><small class="text-secondary">Riskli araç</small><div id="unhealthy-count" class="fs-3 fw-bold text-danger">0</div></div></div></div>
+      </div>
+
+      <!-- Bootstrap sekmeleri, farklı izleme veri setlerini aynı sayfada sade biçimde sunar. -->
+      <div class="card shadow-sm">
+        <div class="card-header p-0"><ul class="nav nav-tabs" role="tablist"><li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#recurring-pane" type="button">Tekrarlayan Arızalar</button></li><li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#health-pane" type="button">Araç Sağlığı</button></li></ul></div>
+        <div class="card-body p-0"><div id="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div><div id="monitoring-content" class="tab-content d-none">
+          <div class="tab-pane fade show active" id="recurring-pane"><div class="alert alert-light border rounded-0 mb-0"><i class="bi bi-info-circle me-1"></i>Son 90 günde aynı araçta ve aynı arıza alt kategorisinde en az iki kez oluşan kayıtlar gösterilir.</div><div class="table-responsive"><table class="table table-striped table-hover align-middle mb-0"><thead><tr><th>Araç</th><th>Garaj</th><th>Kategori</th><th>Arıza sayısı</th><th>İlk arıza</th><th>Son arıza</th></tr></thead><tbody id="recurring-body"></tbody></table></div></div>
+          <div class="tab-pane fade" id="health-pane"><div class="alert alert-light border rounded-0 mb-0"><i class="bi bi-info-circle me-1"></i>Admin ve merkez yetkilisine yalnızca arıza geçmişi bulunan araçlar; garaj yetkilisine kendi garajındaki tüm araçlar gösterilir. Satıra tıklayarak puan ayrıntısını görebilirsiniz.</div><div class="table-responsive"><table class="table table-striped table-hover align-middle mb-0"><thead><tr><th>Araç</th><th>Garaj</th><th>Durum</th><th>Sağlık puanı</th><th>30 gün arıza</th><th>90 gün arıza</th><th>Aktif başarısız kontrol</th></tr></thead><tbody id="health-body"></tbody></table></div></div>
+        </div></div>
+      </div>
+    </div></div>
+  </main>
+  <footer class="app-footer"><strong>© 2026 İETT Arıza Yönetim Sistemi</strong></footer>
+</div>
+<script type="module" src="/src/pages/monitoring.js"></script>
+</body></html>

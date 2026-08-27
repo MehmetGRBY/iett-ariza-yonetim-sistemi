@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="İETT araç listesi ve araç geçmişi" />
+    <title>Araçlar | İETT Arıza Yönetim Sistemi</title>
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <!-- Dashboard ile aynı AdminLTE iskeleti tutarlı kullanıcı deneyimi sağlar. -->
+    <div class="app-wrapper">
+      <!-- Üst navigasyon oturumdaki kullanıcıyı ve çıkış işlemini gösterir. -->
+      <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+        <div class="container-fluid">
+          <button class="btn btn-link nav-link" type="button" data-lte-toggle="sidebar" aria-label="Menüyü aç veya kapat"><i class="bi bi-list fs-4"></i></button>
+          <span class="navbar-text ms-2 fw-semibold">İETT Arıza Yönetim Sistemi</span>
+          <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="text-secondary small" id="current-user">Oturum doğrulanıyor…</span>
+            <button class="btn btn-outline-danger btn-sm" id="logout-button" type="button">Çıkış</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Rol bilgisine göre bazı yönetim bağlantıları JavaScript tarafından gizlenir. -->
+      <aside class="app-sidebar sidebar-iett shadow" data-bs-theme="dark">
+        <div class="sidebar-brand border-bottom"><a href="./index.html" class="brand-link text-decoration-none"><span class="brand-text fw-bold text-white">İETT <span class="brand-accent">AYS</span></span></a></div>
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <ul class="nav sidebar-menu flex-column" id="application-navigation" data-lte-toggle="treeview" role="menu">
+              <li class="nav-item"><a href="./index.html" class="nav-link"><i class="nav-icon bi bi-speedometer2"></i><p>Dashboard</p></a></li>
+              <li class="nav-header">OPERASYON</li>
+              <li class="nav-item"><a href="./vehicles.html" class="nav-link active"><i class="nav-icon bi bi-bus-front"></i><p>Araçlar</p></a></li>
+              <li class="nav-item"><a href="./faults.html" class="nav-link"><i class="nav-icon bi bi-tools"></i><p>Arızalar</p></a></li>
+              <li class="nav-item"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-calendar-check"></i><p>Görevler</p></a></li>
+              <li class="nav-header">YÖNETİM</li>
+              <li class="nav-item"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-buildings"></i><p>Garajlar</p></a></li>
+              <li class="nav-item" data-roles="Admin,Garaj Yetkilisi"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-people"></i><p>Personel</p></a></li>
+              <li class="nav-item" data-roles="Admin"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-person-gear"></i><p>Kullanıcı Yönetimi</p></a></li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Araç filtreleri, server-side liste ve sayfalama kontrollerinin ana alanı. -->
+      <main class="app-main">
+        <div class="app-content-header"><div class="container-fluid py-3"><h1 class="mb-1">Araçlar</h1><p class="text-secondary mb-0">Filo bilgileri, durumları ve araç geçmişi</p></div></div>
+        <div class="app-content">
+          <div class="container-fluid">
+            <div id="vehicles-error" class="alert alert-danger d-none" role="alert"></div>
+            <!-- Form alanları API'nin search, garageId ve isActive sorgu parametrelerini üretir. -->
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <form id="vehicle-filter-form" class="row g-3 align-items-end">
+                  <div class="col-12 col-lg-5">
+                    <label class="form-label" for="vehicle-search">Ara</label>
+                    <input class="form-control" id="vehicle-search" type="search" placeholder="Kapı no, plaka, marka veya model" />
+                  </div>
+                  <div class="col-12 col-md-5 col-lg-3" id="garage-filter-container">
+                    <label class="form-label" for="garage-filter">Garaj</label>
+                    <select class="form-select" id="garage-filter"><option value="">Tüm garajlar</option></select>
+                  </div>
+                  <div class="col-12 col-md-4 col-lg-2">
+                    <label class="form-label" for="active-filter">Kayıt durumu</label>
+                    <select class="form-select" id="active-filter"><option value="">Tümü</option><option value="true">Aktif</option><option value="false">Pasif</option></select>
+                  </div>
+                  <div class="col-12 col-md-3 col-lg-2 d-grid"><button class="btn btn-danger" type="submit"><i class="bi bi-search me-1"></i>Filtrele</button></div>
+                </form>
+              </div>
+            </div>
+
+            <!-- API her istekte en fazla 100 araç döndürür; tbody JavaScript ile doldurulur. -->
+            <div class="card shadow-sm mb-4">
+              <div class="card-header d-flex align-items-center"><h2 class="card-title mb-0">Araç Listesi</h2><span class="badge text-bg-secondary ms-auto" id="vehicle-count">0 kayıt</span></div>
+              <div id="vehicles-loading" class="text-center py-5"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Yükleniyor</span></div></div>
+              <div id="vehicles-table-container" class="table-responsive d-none">
+                <table class="table table-striped table-hover align-middle mb-0">
+                  <thead><tr><th>Kapı No</th><th>Plaka</th><th>Marka / Model</th><th>Yıl</th><th>Tip</th><th>Garaj</th><th>Durum</th><th class="text-end">KM</th><th>Kayıt</th><th></th></tr></thead>
+                  <tbody id="vehicles-body"></tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <span class="text-secondary small" id="page-summary">Sayfa 1 / 1</span>
+                <div class="btn-group"><button class="btn btn-outline-secondary btn-sm" id="previous-page" type="button"><i class="bi bi-chevron-left"></i> Önceki</button><button class="btn btn-outline-secondary btn-sm" id="next-page" type="button">Sonraki <i class="bi bi-chevron-right"></i></button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="app-footer"><span class="float-end d-none d-sm-inline">MG</span><strong>© 2026 İETT Arıza Yönetim Sistemi</strong></footer>
+    </div>
+
+    <!-- Araç temel bilgileri ve üç farklı geçmiş tablosu bu Bootstrap modalında gösterilir. -->
+    <div class="modal fade" id="vehicle-detail-modal" tabindex="-1" aria-labelledby="vehicle-detail-title" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header"><h2 class="modal-title fs-5" id="vehicle-detail-title">Araç Detayı</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+          <div class="modal-body" id="vehicle-detail-content"></div>
+          <div class="modal-footer"><button type="button" class="btn btn-outline-primary d-none" id="vehicle-edit-button">Düzenle</button><button type="button" class="btn btn-outline-danger d-none" id="vehicle-active-button">Pasife Al</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button></div>
+        </div>
+      </div>
+    </div>
+    <!-- Admin araç bilgilerini düzenler; kapı numarası benzersiz kurumsal kimlik olduğu için salt okunurdur. -->
+    <div class="modal fade" id="vehicle-edit-modal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><form id="vehicle-edit-form" class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5">Araç Bilgilerini Düzenle</h2><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><input id="edit-vehicle-id" type="hidden" /><div class="row g-3">
+        <div class="col-md-4"><label class="form-label">Kapı numarası</label><input id="edit-door-number" class="form-control" disabled /></div>
+        <div class="col-md-4"><label class="form-label">Plaka</label><input id="edit-plate" class="form-control" maxlength="20" required /></div>
+        <div class="col-md-4"><label class="form-label">Model yılı</label><input id="edit-model-year" class="form-control" type="number" min="1950" max="2100" required /></div>
+        <div class="col-md-4"><label class="form-label">Marka</label><input id="edit-brand" class="form-control" maxlength="80" required /></div>
+        <div class="col-md-4"><label class="form-label">Model</label><input id="edit-model" class="form-control" maxlength="100" required /></div>
+        <div class="col-md-4"><label class="form-label">Kilometre</label><input id="edit-mileage" class="form-control" type="number" min="0" required /></div>
+        <div class="col-md-3"><label class="form-label">Araç tipi</label><select id="edit-vehicle-type" class="form-select" required></select></div>
+        <div class="col-md-3"><label class="form-label">Yakıt tipi</label><select id="edit-fuel-type" class="form-select" required></select></div>
+        <div class="col-md-3"><label class="form-label">Garaj</label><select id="edit-garage" class="form-select" required></select></div>
+        <div class="col-md-3"><label class="form-label">Araç durumu</label><select id="edit-status" class="form-select" required></select></div>
+        <div class="col-md-6"><label class="form-label">Görev tipi</label><input id="edit-duty-type" class="form-control" maxlength="100" /></div>
+        <div class="col-md-6"><label class="form-label">Yolcu kapasitesi</label><input id="edit-capacity" class="form-control" type="number" min="0" /></div>
+        <div class="col-12"><label class="form-label">Değişiklik açıklaması</label><textarea id="edit-description" class="form-control" maxlength="500" required></textarea></div>
+      </div></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button><button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button></div>
+    </form></div></div>
+    <!-- Araç sayfasına özel filtreleme, sayfalama ve detay işlemlerini başlatır. -->
+    <script type="module" src="/src/pages/vehicles.js"></script>
+  </body>
+</html>

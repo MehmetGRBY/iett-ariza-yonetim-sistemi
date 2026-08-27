@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giriş | İETT Arıza Yönetim Sistemi</title>
+  </head>
+  <body class="login-page">
+    <!-- Giriş ekranı masaüstünde tanıtım ve form olarak ikiye ayrılır, mobilde tek sütuna döner. -->
+    <main class="login-shell">
+      <section class="login-showcase" aria-labelledby="system-title">
+        <div>
+          <div class="login-brand-mark" aria-hidden="true"><i class="bi bi-bus-front-fill"></i></div>
+          <p class="login-eyebrow">İETT · AKILLI ULAŞIM</p>
+          <h1 id="system-title">Arıza Yönetim Sistemi</h1>
+          <p class="login-intro">Filo arızalarını, müdahale ekiplerini ve operasyon süreçlerini tek merkezden güvenle yönetin.</p>
+        </div>
+
+        <!-- Sistemin temel faydaları, giriş yapan personele ekranın amacını hızlıca anlatır. -->
+        <div class="login-feature-list">
+          <div class="login-feature"><span><i class="bi bi-activity"></i></span><div><strong>Anlık operasyon takibi</strong><small>Arıza ve müdahale sürecini uçtan uca izleyin.</small></div></div>
+          <div class="login-feature"><span><i class="bi bi-shield-check"></i></span><div><strong>Yetkili kurum erişimi</strong><small>Rol ve garaj kapsamına göre güvenli çalışma alanı.</small></div></div>
+          <div class="login-feature"><span><i class="bi bi-clock-history"></i></span><div><strong>Kesintisiz kayıt geçmişi</strong><small>Operasyon adımları ve değişiklikler kayıt altında.</small></div></div>
+        </div>
+
+        <p class="login-showcase-footer"><i class="bi bi-lock-fill me-2"></i>Kurum içi kullanıma özel güvenli sistem</p>
+      </section>
+
+      <!-- Kimlik doğrulama alanındaki mevcut id değerleri giriş JavaScript'iyle uyumludur. -->
+      <section class="login-form-panel" aria-labelledby="login-title">
+        <div class="login-form-content">
+          <!-- İETT'nin resmî kurumsal amblemi form alanında sade ve dikkat dağıtmayan
+               bir boyutta gösterilir; alt metin ekran okuyucular için kurum adını taşır. -->
+          <div class="login-official-logo" aria-label="İETT İşletmeleri Genel Müdürlüğü">
+            <img src="/assets/brand/iett-logo.png" alt="İETT logosu" />
+          </div>
+          <p class="login-form-eyebrow">PERSONEL GİRİŞİ</p>
+          <h2 id="login-title">Tekrar hoş geldiniz</h2>
+          <p id="login-description" class="login-form-description">Devam etmek için kurum sicil numaranızı ve parolanızı girin.</p>
+
+          <!-- Kimlik işlemleri ayrı sayfalara dağılmaz; aynı kartta seçilen moda göre form değişir. -->
+          <div class="login-mode-switch" role="tablist" aria-label="Kimlik işlemi seçimi">
+            <button class="login-mode-button active" type="button" data-auth-mode="login" role="tab" aria-selected="true">Giriş Yap</button>
+            <button class="login-mode-button" type="button" data-auth-mode="activate" role="tab" aria-selected="false">İlk Kez Giriş</button>
+            <button class="login-mode-button" type="button" data-auth-mode="change" role="tab" aria-selected="false">Parola Değiştir</button>
+          </div>
+
+          <div id="login-alert" class="alert alert-danger d-none" role="alert"></div>
+          <!-- novalidate ile tarayıcı mesajları yerine uygulamanın ortak Türkçe doğrulaması kullanılır. -->
+          <form id="login-form" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="personnel-number">Sicil numarası</label>
+              <div class="login-input-wrap">
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
+                <input id="personnel-number" class="form-control" type="text" autocomplete="username" placeholder="Örn. MRK-001" required autofocus />
+              </div>
+            </div>
+            <div id="current-password-group" class="mb-3">
+              <label id="current-password-label" class="form-label" for="password">Parola</label>
+              <div class="login-input-wrap">
+                <i class="bi bi-lock" aria-hidden="true"></i>
+                <input id="password" class="form-control" type="password" autocomplete="current-password" placeholder="Parolanızı girin" required />
+              </div>
+            </div>
+            <div id="new-password-fields" class="d-none">
+              <div class="mb-3">
+                <label class="form-label" for="new-password">Yeni parola</label>
+                <div class="login-input-wrap">
+                  <i class="bi bi-key" aria-hidden="true"></i>
+                  <input id="new-password" class="form-control" type="password" minlength="8" maxlength="100" autocomplete="new-password" placeholder="En az 8 karakter" />
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label" for="confirm-password">Yeni parola tekrarı</label>
+                <div class="login-input-wrap">
+                  <i class="bi bi-shield-check" aria-hidden="true"></i>
+                  <input id="confirm-password" class="form-control" type="password" autocomplete="new-password" placeholder="Yeni parolayı tekrar girin" />
+                </div>
+              </div>
+            </div>
+            <button id="login-button" class="btn btn-primary login-submit w-100" type="submit">
+              <!-- Spinner yalnızca API isteği sürerken JavaScript tarafından görünür yapılır. -->
+              <span id="login-spinner" class="spinner-border spinner-border-sm me-2 d-none" aria-hidden="true"></span>
+              <span id="login-button-text">Sisteme Giriş Yap</span>
+              <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
+            </button>
+          </form>
+
+          <div class="login-access-note">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <span>Sisteme yalnızca Admin, Merkez Yetkilisi ve Garaj Yetkilisi hesapları erişebilir.</span>
+          </div>
+          <p class="login-copyright">© 2026 İETT Arıza Yönetim Sistemi</p>
+        </div>
+      </section>
+    </main>
+    <!-- Giriş sayfasına özel JWT ve form işlemlerini başlatan ES Module. -->
+    <script type="module" src="/src/pages/login.js"></script>
+  </body>
+</html>

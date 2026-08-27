@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sürücü personel olayları, yedek sürücü ve görev devri yönetimi" />
+    <title>Personel Olayları | İETT Arıza Yönetim Sistemi</title>
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <!-- AdminLTE uygulama iskeleti diğer operasyon sayfalarıyla aynı kullanıcı deneyimini sağlar. -->
+    <div class="app-wrapper">
+      <nav class="app-header navbar navbar-expand bg-body shadow-sm"><div class="container-fluid">
+        <button class="btn btn-link nav-link" type="button" data-lte-toggle="sidebar" aria-label="Menüyü aç veya kapat"><i class="bi bi-list fs-4"></i></button>
+        <span class="navbar-text ms-2 fw-semibold">İETT Arıza Yönetim Sistemi</span>
+        <div class="ms-auto d-flex align-items-center gap-3"><span class="text-secondary small" id="current-user">Oturum doğrulanıyor…</span><button class="btn btn-outline-danger btn-sm" id="logout-button" type="button">Çıkış</button></div>
+      </div></nav>
+
+      <!-- Ortak navigasyon oturumdaki role ve aktif sayfaya göre JavaScript ile üretilir. -->
+      <aside class="app-sidebar sidebar-iett shadow" data-bs-theme="dark">
+        <div class="sidebar-brand border-bottom"><a href="./index.html" class="brand-link text-decoration-none"><span class="brand-text fw-bold text-white">İETT <span class="brand-accent">AYS</span></span></a></div>
+        <div class="sidebar-wrapper"><nav class="mt-2"><ul class="nav sidebar-menu flex-column" id="application-navigation" data-lte-toggle="treeview" role="menu"></ul></nav></div>
+      </aside>
+
+      <main class="app-main">
+        <div class="app-content-header"><div class="container-fluid py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div><h1 class="mb-1">Personel Olayları ve Görev Devri</h1><p class="text-secondary mb-0">Aktif görevde rahatsızlanan sürücü, yedek personel ve sağlık raporu süreci</p></div>
+          <button class="btn btn-primary" id="open-incident-form" type="button"><i class="bi bi-plus-lg me-1"></i>Yeni Personel Olayı</button>
+        </div></div>
+        <div class="app-content"><div class="container-fluid">
+          <div id="incidents-error" class="alert alert-danger d-none" role="alert"></div>
+
+          <!-- Olayların operasyonel durumunu hızlı okumak için özet kartları gösterilir. -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-secondary">Toplam olay</div><div class="fs-3 fw-bold" id="incident-total">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="card h-100 border-warning"><div class="card-body"><div class="small text-secondary">Rapor bekleyen</div><div class="fs-3 fw-bold text-warning-emphasis" id="incident-report-pending">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="card h-100 border-primary"><div class="card-body"><div class="small text-secondary">Yedek bekleyen</div><div class="fs-3 fw-bold text-primary" id="incident-replacement-pending">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="card h-100 border-success"><div class="card-body"><div class="small text-secondary">Devredilen görev</div><div class="fs-3 fw-bold text-success" id="incident-transferred-tasks">0</div></div></div></div>
+          </div>
+
+          <!-- Personel olayları backend kapsamına göre tabloya dinamik olarak eklenir. -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex align-items-center"><h2 class="card-title mb-0">Personel Olayları</h2><span class="badge text-bg-secondary ms-auto" id="incident-count">0 kayıt</span></div>
+            <div id="incidents-loading" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor</span></div></div>
+            <div id="incidents-table-container" class="table-responsive d-none"><table class="table table-striped table-hover align-middle mb-0">
+              <thead><tr><th>Olay No</th><th>Sürücü</th><th>Garaj</th><th>Tür</th><th>Durum</th><th>Yedek Sürücü</th><th>Görev Devri</th><th>Rapor</th><th>Dönüş</th><th></th></tr></thead>
+              <tbody id="incidents-body"></tbody>
+            </table></div>
+          </div>
+        </div></div>
+      </main>
+      <footer class="app-footer"><span class="float-end d-none d-sm-inline">MG</span><strong>© 2026 İETT Arıza Yönetim Sistemi</strong></footer>
+    </div>
+
+    <!-- Yeni olay formunda yalnızca anlık aktif görevde bulunan sürücüler seçilebilir. -->
+    <div class="modal fade" id="incident-create-modal" tabindex="-1" aria-labelledby="incident-create-title" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5" id="incident-create-title">Yeni Personel Olayı</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+      <form id="incident-create-form"><div class="modal-body"><div id="incident-create-error" class="alert alert-danger d-none"></div><div class="row g-3">
+        <div class="col-12"><label class="form-label" for="incident-driver">Aktif görevdeki sürücü</label><select class="form-select" id="incident-driver" required><option value="">Sürücü ve görev seçin</option></select><div class="form-text">Yalnızca şu anda devam eden görevlere atanmış sürücüler gösterilir.</div></div>
+        <div class="col-12 col-md-6"><label class="form-label" for="incident-type">Olay türü</label><select class="form-select" id="incident-type" required><option value="ILLNESS">Hastalık / Fenalaşma</option><option value="EMERGENCY">Acil durum</option><option value="UNFIT_FOR_DUTY">Göreve uygun değil</option></select></div>
+        <div class="col-12 col-md-6"><label class="form-label">Olay zamanı</label><input class="form-control" id="incident-time" type="datetime-local" disabled /></div>
+        <div class="col-12"><label class="form-label" for="incident-description">Olay açıklaması</label><textarea class="form-control" id="incident-description" rows="4" maxlength="2000" required placeholder="Sürücüden veya merkez personelinden alınan bilgiyi yazın"></textarea></div>
+      </div></div><div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button><button class="btn btn-primary" id="incident-create-button" type="submit"><span class="spinner-border spinner-border-sm me-2 d-none" id="incident-create-spinner"></span>Olayı Oluştur ve Görevleri Devret</button></div></form>
+    </div></div></div>
+
+    <!-- Doktor raporu sonradan alındığında rapor tarihleri ve dönüş günü bu formdan girilir. -->
+    <div class="modal fade" id="incident-report-modal" tabindex="-1" aria-labelledby="incident-report-title" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5" id="incident-report-title">Sağlık Raporu Gir</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+      <form id="incident-report-form"><div class="modal-body"><div id="incident-report-error" class="alert alert-danger d-none"></div><input id="incident-report-id" type="hidden" /><div class="row g-3">
+        <div class="col-12 col-md-6"><label class="form-label" for="report-start-date">Rapor başlangıcı</label><input class="form-control" id="report-start-date" type="date" required /></div>
+        <div class="col-12 col-md-6"><label class="form-label" for="report-end-date">Rapor bitişi</label><input class="form-control" id="report-end-date" type="date" required /></div>
+        <div class="col-12"><label class="form-label" for="medical-report-number">Rapor numarası</label><input class="form-control" id="medical-report-number" maxlength="100" /></div>
+        <div class="col-12"><label class="form-label" for="report-notes">Rapor notu</label><textarea class="form-control" id="report-notes" rows="3" maxlength="2000"></textarea></div>
+      </div></div><div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button><button class="btn btn-primary" type="submit">Raporu Kaydet</button></div></form>
+    </div></div></div>
+
+    <script type="module" src="/src/pages/personnel-incidents.js"></script>
+  </body>
+</html>

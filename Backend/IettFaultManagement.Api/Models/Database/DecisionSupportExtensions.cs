@@ -1,0 +1,5 @@
+using System.ComponentModel.DataAnnotations;using System.ComponentModel.DataAnnotations.Schema;
+namespace IettFaultManagement.Api.Models.Database;
+public partial class Fault{[Column("response_due_at")]public DateTime? ResponseDueAt{get;set;}[Column("resolution_due_at")]public DateTime? ResolutionDueAt{get;set;}[Column("first_response_at")]public DateTime? FirstResponseAt{get;set;}}
+public partial class FaultCategory{[Column("response_sla_minutes")]public int ResponseSlaMinutes{get;set;}[Column("resolution_sla_minutes")]public int ResolutionSlaMinutes{get;set;}[Column("recurrence_window_days")]public int RecurrenceWindowDays{get;set;}[Column("recurrence_alert_count")]public int RecurrenceAlertCount{get;set;}}
+public partial class RepairReport{[Column("root_cause_id")]public long? RootCauseId{get;set;}[Column("solution_summary"),StringLength(1000)]public string? SolutionSummary{get;set;}[Column("recurrence_prevention"),StringLength(1000)]public string? RecurrencePrevention{get;set;}[Column("requires_follow_up")]public bool RequiresFollowUp{get;set;}}

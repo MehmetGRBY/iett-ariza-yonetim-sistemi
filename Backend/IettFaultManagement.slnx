@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="IettFaultManagement.Api.Tests/IettFaultManagement.Api.Tests.csproj" />
+  <Project Path="IettFaultManagement.Api/IettFaultManagement.Api.csproj" />
+</Solution>

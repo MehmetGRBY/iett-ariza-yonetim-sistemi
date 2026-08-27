@@ -1,0 +1,35 @@
+# Geliştirme araçlarının yerel çalışma dosyaları
+/.agents/
+/.codex-build/
+**/.codex-build/
+**/.compile-check/
+**/.verification/
+.vs/
+
+# .NET derleme çıktıları
+**/bin/
+**/obj/
+
+# Frontend bağımlılıkları ve üretim çıktıları
+**/node_modules/
+**/dist/
+
+# Visual Studio ve yerel kullanıcı ayarları
+*.user
+*.suo
+
+# Çalışma zamanı logları ve kullanıcı tarafından yüklenen dosyalar
+*.log
+**/App_Data/Uploads/
+**/App_Data/Keys/
+.aspnet/DataProtection-Keys/
+
+# Yerel ortam ve hassas bilgi dosyaları
+.env
+.env.*
+!.env.example
+*.secrets.local
+*.pfx
+*.p12
+*.pem
+*.key

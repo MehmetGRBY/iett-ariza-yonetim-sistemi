@@ -1,0 +1,13 @@
+using IettFaultManagement.Api.Data;using IettFaultManagement.Api.Extensions;using Microsoft.AspNetCore.Authorization;using Microsoft.AspNetCore.Mvc;using Microsoft.EntityFrameworkCore;
+namespace IettFaultManagement.Api.Controllers;
+[ApiController,Authorize(Roles="Admin,Merkez Yetkilisi,Garaj Yetkilisi"),Route("api/tasks")]
+/// <summary>
+/// Hat, vardiya, servis görevi ve aktif araç/sürücü atamalarını frontend'e sunar.
+/// Garaj yetkilisinin görev görünümünü kendi garajıyla sınırlar.
+/// </summary>
+public sealed class TasksController(ApplicationDbContext db):ControllerBase
+{
+ [HttpGet]public async Task<IActionResult> Get([FromQuery]DateOnly? date=null,[FromQuery]long? routeId=null){var serviceDate=date??DateOnly.FromDateTime(DateTime.Today);var q=db.ServiceTasks.AsNoTracking().Where(x=>x.IsActive&&x.ServiceDate==serviceDate);if(routeId.HasValue)q=q.Where(x=>x.RouteId==routeId);if(User.IsInRole("Garaj Yetkilisi")){var garage=User.GarageId();q=q.Where(x=>x.TaskAssignments.Any(a=>a.IsActive&&a.Vehicle.GarageId==garage));}var items=await q.OrderBy(x=>x.PlannedDepartureAt).Select(x=>new{x.Id,x.TaskNumber,x.ServiceDate,x.SequenceNumber,x.PlannedDepartureAt,x.PlannedArrivalAt,x.ActualDepartureAt,x.ActualArrivalAt,x.Status,Route=new{x.Route.Id,x.Route.Code,x.Route.Name},Assignment=x.TaskAssignments.Where(a=>a.IsActive).Select(a=>new{a.Id,Vehicle=new{a.Vehicle.Id,a.Vehicle.DoorNumber,a.Vehicle.Plate},Driver=new{a.Driver.Id,a.Driver.PersonnelNumber,FullName=a.Driver.FirstName+" "+a.Driver.LastName},a.AssignmentType}).FirstOrDefault()}).ToListAsync();return Ok(items);}
+ [HttpGet("{id:long}")]public async Task<IActionResult> Details(long id){var item=await db.ServiceTasks.AsNoTracking().Where(x=>x.Id==id).Select(x=>new{x.Id,x.TaskNumber,x.ServiceDate,x.SequenceNumber,x.PlannedDepartureAt,x.PlannedArrivalAt,x.ActualDepartureAt,x.ActualArrivalAt,x.Status,Route=new{x.Route.Id,x.Route.Code,x.Route.Name},Assignments=x.TaskAssignments.OrderByDescending(a=>a.AssignedAt).Select(a=>new{a.Id,a.IsActive,a.AssignmentType,a.AssignedAt,a.EndedAt,a.Description,Vehicle=new{a.Vehicle.Id,a.Vehicle.DoorNumber,a.Vehicle.Plate,a.Vehicle.GarageId},Driver=new{a.Driver.Id,a.Driver.PersonnelNumber,FullName=a.Driver.FirstName+" "+a.Driver.LastName}}).ToList()}).SingleOrDefaultAsync();if(item is null)return NotFound();if(User.IsInRole("Garaj Yetkilisi")&&!item.Assignments.Any(x=>x.Vehicle.GarageId==User.GarageId()))return Forbid();return Ok(item);}
+ [HttpGet("routes")]public async Task<IActionResult> Routes()=>Ok(await db.Routes.AsNoTracking().Where(x=>x.IsActive).OrderBy(x=>x.Code).Select(x=>new{x.Id,x.Code,x.Name}).ToListAsync());
+}

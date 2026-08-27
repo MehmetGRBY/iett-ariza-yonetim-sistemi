@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="İETT arıza kayıtları, müdahale planları ve süreç geçmişi" />
+    <title>Arızalar | İETT Arıza Yönetim Sistemi</title>
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <!-- AdminLTE uygulama iskeleti üst menü, sol menü, içerik ve alt bilgiyi birlikte düzenler. -->
+    <div class="app-wrapper">
+      <!-- Üst menüde mobil menü düğmesi, oturum bilgisi ve güvenli çıkış işlemi bulunur. -->
+      <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+        <div class="container-fluid">
+          <button class="btn btn-link nav-link" type="button" data-lte-toggle="sidebar" aria-label="Menüyü aç veya kapat"><i class="bi bi-list fs-4"></i></button>
+          <span class="navbar-text ms-2 fw-semibold">İETT Arıza Yönetim Sistemi</span>
+          <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="text-secondary small" id="current-user">Oturum doğrulanıyor…</span>
+            <button class="btn btn-outline-danger btn-sm" id="logout-button" type="button">Çıkış</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- data-roles değerleri JavaScript tarafından değerlendirilerek rol bazlı görünürlük sağlanır. -->
+      <aside class="app-sidebar sidebar-iett shadow" data-bs-theme="dark">
+        <div class="sidebar-brand border-bottom">
+          <a href="./index.html" class="brand-link text-decoration-none"><span class="brand-text fw-bold text-white">İETT <span class="brand-accent">AYS</span></span></a>
+        </div>
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <ul class="nav sidebar-menu flex-column" id="application-navigation" data-lte-toggle="treeview" role="menu">
+              <li class="nav-item"><a href="./index.html" class="nav-link"><i class="nav-icon bi bi-speedometer2"></i><p>Dashboard</p></a></li>
+              <li class="nav-header">OPERASYON</li>
+              <li class="nav-item"><a href="./vehicles.html" class="nav-link"><i class="nav-icon bi bi-bus-front"></i><p>Araçlar</p></a></li>
+              <li class="nav-item"><a href="./faults.html" class="nav-link active"><i class="nav-icon bi bi-tools"></i><p>Arızalar</p></a></li>
+              <li class="nav-item"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-calendar-check"></i><p>Görevler</p></a></li>
+              <li class="nav-header">YÖNETİM</li>
+              <li class="nav-item"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-buildings"></i><p>Garajlar</p></a></li>
+              <li class="nav-item" data-roles="Admin,Garaj Yetkilisi"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-people"></i><p>Personel</p></a></li>
+              <li class="nav-item" data-roles="Admin"><a href="#" class="nav-link disabled"><i class="nav-icon bi bi-person-gear"></i><p>Kullanıcı Yönetimi</p></a></li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Arıza arama, filtreleme, server-side sayfalama ve detay görüntüleme alanı. -->
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div><h1 class="mb-1">Arızalar</h1><p class="text-secondary mb-0">Arıza kayıtları, atanan ekipler ve müdahale süreçleri</p></div>
+            <!-- Arıza oluşturma backend'de de yalnızca Admin ve Merkez Yetkilisine açıktır. -->
+            <button class="btn btn-primary" id="open-create-fault" type="button" data-roles="Admin,Merkez Yetkilisi"><i class="bi bi-plus-lg me-1"></i>Yeni Arıza Kaydı</button>
+          </div>
+        </div>
+        <div class="app-content">
+          <div class="container-fluid">
+            <div id="faults-error" class="alert alert-danger d-none" role="alert"></div>
+
+            <!-- Filtre formu API'nin search ve statusId sorgu parametrelerini üretir. -->
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <form id="fault-filter-form" class="row g-3 align-items-end">
+                  <div class="col-12 col-lg-7">
+                    <label class="form-label" for="fault-search">Ara</label>
+                    <input class="form-control" id="fault-search" type="search" placeholder="Arıza no, kapı no veya açıklama" />
+                  </div>
+                  <div class="col-12 col-md-7 col-lg-3">
+                    <label class="form-label" for="status-filter">Arıza durumu</label>
+                    <select class="form-select" id="status-filter"><option value="">Tüm durumlar</option></select>
+                  </div>
+                  <div class="col-12 col-md-5 col-lg-2 d-grid">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>Filtrele</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Arıza satırları tbody alanına JavaScript ile güvenli biçimde eklenir. -->
+            <div class="card shadow-sm mb-4">
+              <div class="card-header d-flex align-items-center"><h2 class="card-title mb-0">Arıza Listesi</h2><span class="badge text-bg-secondary ms-auto" id="fault-count">0 kayıt</span></div>
+              <div id="faults-loading" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor</span></div></div>
+              <div id="faults-table-container" class="table-responsive d-none">
+                <table class="table table-striped table-hover align-middle mb-0">
+                  <thead><tr><th>Arıza No</th><th>Araç</th><th>Garaj</th><th>Sürücü</th><th>Kategori</th><th>Durum</th><th>Ekip</th><th>Tarih</th><th></th></tr></thead>
+                  <tbody id="faults-body"></tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <span class="text-secondary small" id="fault-page-summary">Sayfa 1 / 1</span>
+                <div class="btn-group"><button class="btn btn-outline-secondary btn-sm" id="fault-previous-page" type="button"><i class="bi bi-chevron-left"></i> Önceki</button><button class="btn btn-outline-secondary btn-sm" id="fault-next-page" type="button">Sonraki <i class="bi bi-chevron-right"></i></button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer"><span class="float-end d-none d-sm-inline">MG</span><strong>© 2026 İETT Arıza Yönetim Sistemi</strong></footer>
+    </div>
+
+    <!-- Arıza, müdahale planı, kaynak, geçmiş ve rapor bilgileri bu modalda oluşturulur. -->
+    <div class="modal fade" id="fault-detail-modal" tabindex="-1" aria-labelledby="fault-detail-title" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header"><h2 class="modal-title fs-5" id="fault-detail-title">Arıza Detayı</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+          <div class="modal-body" id="fault-detail-content"></div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Merkez personelinin telefonla aldığı bilgiyi sistemli biçimde kaydettiği arıza formu. -->
+    <div class="modal fade" id="create-fault-modal" tabindex="-1" aria-labelledby="create-fault-title" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <!-- Form doğrudan modal-content yapılır. Böylece Bootstrap, uzun içeriği
+             ekranın dışına taşırmak yerine modal-body içinde kaydırabilir. -->
+        <form id="create-fault-form" class="modal-content">
+          <div class="modal-header"><h2 class="modal-title fs-5" id="create-fault-title">Yeni Arıza Kaydı</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+          <div class="modal-body">
+              <div id="create-fault-error" class="alert alert-danger d-none" role="alert"></div>
+
+              <!-- Aktif görev seçimi kapı numarasını ve mevcut sürücüyü otomatik getirir. -->
+              <section class="card mb-4">
+                <div class="card-header fw-semibold">1. Araç ve sürücü</div>
+                <div class="card-body">
+                  <div class="btn-group w-100 mb-3" role="group" aria-label="Arıza kayıt türü">
+                    <input class="btn-check" type="radio" name="fault-entry-mode" id="fault-mode-task" value="ACTIVE_TASK" checked><label class="btn btn-outline-primary" for="fault-mode-task"><i class="bi bi-signpost-split me-1"></i>Aktif görevdeki araç</label>
+                    <input class="btn-check" type="radio" name="fault-entry-mode" id="fault-mode-other" value="NON_TASK"><label class="btn btn-outline-primary" for="fault-mode-other"><i class="bi bi-wrench-adjustable me-1"></i>Garajdaki görev dışı araç</label>
+                  </div>
+                  <div class="row g-3 align-items-end">
+                    <div class="col-12 col-lg-6" id="active-task-vehicle-container"><label class="form-label" for="active-task-vehicle">Şu an görevdeki araçlar</label><select class="form-select" id="active-task-vehicle"><option value="">Görevdeki araçlardan seçin</option></select></div>
+                    <div class="col-12 col-md-8 col-lg-4"><label class="form-label" for="fault-door-number">Kapı numarası</label><input class="form-control" id="fault-door-number" required placeholder="Örn. OTB-000001" /></div>
+                    <div class="col-12 col-md-4 col-lg-2 d-grid"><button class="btn btn-outline-primary" id="load-fault-vehicle" type="button"><i class="bi bi-arrow-repeat me-1"></i>Aracı Getir</button></div>
+                  </div>
+                  <div id="fault-vehicle-summary" class="alert alert-light border mt-3 mb-0 d-none"></div>
+                  <div id="fault-entry-help" class="form-text mt-2">Aktif görev seçildiğinde araç ve sürücü bilgisi otomatik getirilir.</div>
+                  <div class="row g-3 mt-1 d-none" id="non-task-context-container">
+                    <div class="col-12 col-md-6"><label class="form-label" for="fault-operation-context">Arızanın fark edildiği durum</label><select class="form-select" id="fault-operation-context"><option value="GARAGE_CHECK">Garaj kontrolü</option><option value="PRE_SERVICE_CHECK">Servis öncesi kontrol</option><option value="TEST_DRIVE">Test sürüşü</option><option value="TRANSFER">Araç transferi</option><option value="OTHER">Diğer</option></select></div>
+                    <div class="col-12 col-md-6" id="fault-driver-container"><label class="form-label" for="fault-driver">Sürücü <span id="fault-driver-required-label" class="text-danger d-none">*</span></label><select class="form-select" id="fault-driver"><option value="">Sürücü yok / seçilmedi</option></select><div class="form-text" id="fault-driver-help">Garaj ve servis öncesi kontrolde sürücü isteğe bağlıdır.</div></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Arıza tanımı ve gerçekleşme bilgileri backend DTO doğrulamalarına uygun alanlardır. -->
+              <section class="card mb-4">
+                <div class="card-header fw-semibold">2. Arıza bilgileri</div>
+                <div class="card-body"><div class="row g-3">
+                  <div class="col-12 col-lg-6"><label class="form-label" for="fault-category">Arıza alt kategorisi</label><select class="form-select" id="fault-category" required><option value="">Alt kategori seçin</option></select></div>
+                  <div class="col-12 col-md-6 col-lg-3"><label class="form-label" for="fault-mileage">Arıza anındaki KM</label><input class="form-control" id="fault-mileage" type="number" min="0" required /></div>
+                  <div class="col-12 col-md-6 col-lg-3"><label class="form-label" for="fault-occurred-at">Arıza zamanı</label><input class="form-control" id="fault-occurred-at" type="datetime-local" required /></div>
+                  <div class="col-12" id="fault-location-container"><label class="form-label" for="fault-location">Adres / konum açıklaması</label><input class="form-control" id="fault-location" maxlength="500" required placeholder="Örn. Ümraniye Belediyesi önü" /></div>
+                  <div class="col-12"><label class="form-label" for="fault-description">Arıza açıklaması</label><textarea class="form-control" id="fault-description" rows="3" maxlength="3000" required></textarea></div>
+                  <div class="col-12"><label class="form-label" for="fault-attachment">Fotoğraf veya belge</label><input class="form-control" id="fault-attachment" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" /><div class="form-text">Arıza kaydı oluşturulduktan sonra seçilen dosya güvenli olarak kayda eklenir.</div></div>
+                </div></div>
+              </section>
+
+              <!-- Çekici, hizmet aracı ve yedek araç kararları bu cevaplardan backend policy tarafından hesaplanır. -->
+              <section class="card mb-0" id="fault-assessment-section">
+                <div class="card-header fw-semibold">3. Ön değerlendirme</div>
+                <div class="card-body"><div class="row g-3">
+                  <div class="col-12 col-md-6"><label class="form-label" for="fault-mobility">Araç hareket durumu</label><select class="form-select" id="fault-mobility"><option value="MOVABLE">Hareket edebilir</option><option value="IMMOBILE">Hareket edemez</option></select></div>
+                  <div class="col-12 col-md-6"><label class="form-label" for="fault-onsite">Müdahale kararı</label><select class="form-select" id="fault-onsite"><option value="YES">Yerinde müdahale yapılabilir</option><option value="NO">Garaja alınmalı</option></select></div>
+                  <div class="col-12" id="active-task-assessment-fields"><div class="row g-3">
+                    <div class="col-12 col-md-6"><div class="form-check mt-md-4"><input class="form-check-input" id="fault-current-trip" type="checkbox"><label class="form-check-label" for="fault-current-trip">Mevcut seferi tamamlayabilir</label></div></div>
+                    <div class="col-12 col-md-6"><div class="form-check mt-md-4"><input class="form-check-input" id="fault-remaining-tasks" type="checkbox" disabled><label class="form-check-label" for="fault-remaining-tasks">Mevcut seferden sonra bugünün kalan seferlerini de tamamlayabilir</label><div class="form-text" id="fault-remaining-help">Önce mevcut seferi tamamlayabilir seçilmelidir.</div></div></div>
+                  </div></div>
+                  <div class="col-12"><label class="form-label" for="fault-assessment-note">Ön değerlendirme notu</label><textarea class="form-control" id="fault-assessment-note" rows="2" maxlength="900" required placeholder="Şoförden alınan ilk bilgi ve gözlemler"></textarea></div>
+                  <div class="col-12"><label class="form-label" for="fault-team">Teknik ekip kararı</label><div class="input-group"><select class="form-select" id="fault-team"><option value="">Ekip seçilmezse bekleme sırasına alınır</option></select><button class="btn btn-outline-primary" id="load-team-recommendations" type="button"><i class="bi bi-lightbulb me-1"></i>Müsait Ekipleri Getir</button></div><div class="form-text" id="fault-team-help">Araç ve alt kategori seçildikten sonra müsait ekipleri getirip atamayı siz yapabilirsiniz.</div></div>
+                </div></div>
+              </section>
+
+              <!-- Bu adım ön değerlendirme cevaplarına göre dinamik açılır ve
+                   kullanıcıya yalnızca gerçekten gereken kaynak türünü seçtirir. -->
+              <section class="card mt-4 d-none border-primary" id="fault-resource-section">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  <span>4. Manuel kaynak seçimi ve gönderim</span>
+                  <button class="btn btn-sm btn-outline-primary" id="refresh-fault-resources" type="button"><i class="bi bi-arrow-repeat me-1"></i>Kaynakları yenile</button>
+                </div>
+                <div class="card-body">
+                  <div class="alert alert-info" id="fault-resource-decision"></div>
+                  <div class="alert alert-danger d-none" id="fault-resource-error"></div>
+                  <p class="text-body-secondary mb-3">Sistem yalnızca gereken kaynak türünü belirler. Gönderilecek aracı merkez yetkilisi bu alandan kendisi seçer.</p>
+                  <div class="row g-3">
+                    <div class="col-12 d-none" id="fault-tow-row"><label class="form-label" for="fault-tow-truck">Çekici</label><select class="form-select" id="fault-tow-truck"><option value="">Müsait çekici seçin</option></select></div>
+                    <div class="col-12 d-none" id="fault-service-row"><label class="form-label" for="fault-service-vehicle">Hizmet aracı</label><select class="form-select" id="fault-service-vehicle"><option value="">Müsait hizmet aracı seçin</option></select></div>
+                    <div class="col-12 d-none" id="fault-replacement-row"><div class="row g-3"><div class="col-md-6"><label class="form-label" for="fault-replacement-vehicle">Yeni / yedek araç</label><select class="form-select" id="fault-replacement-vehicle"><option value="">Müsait yedek araç seçin</option></select></div><div class="col-md-6"><label class="form-label" for="fault-replacement-driver">Yedek araç sürücüsü</label><select class="form-select" id="fault-replacement-driver"><option value="">Müsait yedek sürücü seçin</option></select></div></div><div class="form-text">Görevleri devralacak araç ve sürücüyü merkez yetkilisi birlikte seçer.</div></div>
+                  </div>
+                </div>
+              </section>
+          </div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button><button class="btn btn-primary" id="create-fault-button" type="submit"><span class="spinner-border spinner-border-sm me-2 d-none" id="create-fault-spinner"></span>Arızayı Oluştur ve Seçilen Kaynakları Gönder</button></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Arıza sayfasına özel veri yükleme, filtreleme ve modal işlemlerini başlatır. -->
+    <script type="module" src="/src/pages/faults.js"></script>
+  </body>
+</html>

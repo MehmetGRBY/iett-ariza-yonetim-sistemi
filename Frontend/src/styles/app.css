@@ -1,0 +1,990 @@
+/* Projeye özel renkler tek merkezden değiştirilmek üzere CSS değişkeni olarak tanımlanır. */
+:root {
+  --app-primary: #2563eb;
+  --app-primary-dark: #1d4ed8;
+  --app-sidebar: #111827;
+  --app-sidebar-hover: #1f2937;
+  --app-sidebar-muted: #94a3b8;
+  --app-content-bg: #ffffff;
+  --app-surface: #ffffff;
+  --app-text: #172033;
+  --app-text-muted: #64748b;
+  --app-border: #dbe2ea;
+}
+
+/* Kısa içerikli sayfalarda bile uygulamanın ekran yüksekliğini kaplaması sağlanır. */
+body {
+  /* Bootstrap yardımcı sınıflarının koyu işletim sistemi temasına geçmesini engeller. */
+  --bs-body-color: var(--app-text);
+  --bs-body-bg: #ffffff;
+  --bs-secondary-color: var(--app-text-muted);
+  --bs-secondary-bg: #eef2f7;
+  --bs-tertiary-color: #475569;
+  --bs-tertiary-bg: #f8fafc;
+  --bs-border-color: var(--app-border);
+  min-height: 100vh;
+  color: var(--app-text);
+  background-color: var(--app-content-bg);
+  color-scheme: light;
+}
+
+/*
+ * Yönetim ekranlarının çalışma alanı daima açık temada tutulur. Yan menü kendi
+ * data-bs-theme="dark" değeriyle lacivert kalırken içerik, kart ve tablolar daha
+ * uzun süre rahat okunabilecek beyaz yüzeyler üzerinde gösterilir.
+ */
+.app-main,
+.app-content,
+.app-content-header {
+  color: var(--app-text);
+  background-color: var(--app-content-bg);
+}
+
+.app-header {
+  color: #fff;
+  background: linear-gradient(90deg, var(--app-sidebar) 0%, #0b1120 100%) !important;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.app-header .nav-link,
+.app-header .navbar-text {
+  color: #e9eef3 !important;
+}
+
+.app-header #current-user {
+  color: #cbd5e1 !important;
+}
+
+.header-notification-button {
+  color: #e9eef3;
+  border-color: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.header-notification-button:hover,
+.header-notification-button:focus,
+.header-notification-button.show {
+  color: #fff;
+  background-color: var(--app-sidebar-hover);
+}
+
+.notification-dropdown {
+  width: min(24rem, calc(100vw - 2rem));
+  overflow: hidden;
+  color: var(--app-text);
+  background-color: #fff;
+  border-color: var(--app-border);
+}
+
+.notification-dropdown-list {
+  max-height: 26rem;
+  overflow-y: auto;
+}
+
+.notification-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  color: var(--app-text);
+  text-align: left;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.notification-dropdown-item:hover {
+  background-color: #f1f5f9;
+}
+
+.notification-dropdown-item.is-unread {
+  background-color: #eff6ff;
+  border-left: 0.25rem solid var(--app-primary);
+}
+
+/* Bootstrap'in koyu tema değişkenleri etkin olsa bile ana içerik bileşenleri açık kalır. */
+.app-main .card,
+.app-main .info-box,
+.app-main .modal-content,
+.app-main .dropdown-menu,
+.app-main .list-group-item {
+  color: var(--app-text);
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+}
+
+.app-main .card-header,
+.app-main .card-footer,
+.app-main .modal-header,
+.app-main .modal-footer {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: var(--app-border);
+}
+
+.app-main .table {
+  --bs-table-color: var(--app-text);
+  --bs-table-bg: #ffffff;
+  --bs-table-border-color: var(--app-border);
+  --bs-table-striped-color: var(--app-text);
+  --bs-table-striped-bg: #f8fafc;
+  --bs-table-hover-color: var(--app-text);
+  --bs-table-hover-bg: #eef4ff;
+  color: var(--app-text);
+}
+
+.app-main .table thead th {
+  color: #263247;
+  background-color: #eef2f7;
+  border-bottom-color: #cbd5e1;
+}
+
+.app-main .form-control,
+.app-main .form-select,
+.app-main .input-group-text,
+.app-main textarea {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.app-main .form-control::placeholder,
+.app-main textarea::placeholder {
+  color: #7c8799;
+  opacity: 1;
+}
+
+.app-main .form-control:focus,
+.app-main .form-select:focus,
+.app-main textarea:focus {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 0.2rem rgb(37 99 235 / 14%);
+}
+
+.app-main .text-secondary {
+  color: var(--app-text-muted) !important;
+}
+
+.app-main pre,
+.app-main code {
+  color: #24324a;
+}
+
+/*
+ * Sistem Ayarları modalları app-main dışında oluşturulduğu için açık tema ayrıca
+ * tanımlanır. JSON değer kutuları siyah blok yerine açık gri kod yüzeyi kullanır.
+ */
+.modal-content {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: var(--app-border);
+}
+
+/*
+ * Modallar app-main dışında bulunduğu için AdminLTE/Bootstrap tema
+ * değişkenlerini miras alabilir. Modal içindeki kart, tablo ve metinler
+ * açık zeminde daima koyu ve okunabilir renkte tutulur.
+ */
+.modal-content .card,
+.modal-content .card-body,
+.modal-content .list-group-item {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: var(--app-border);
+}
+
+.modal-content .card-header,
+.modal-content .card-footer {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: var(--app-border);
+}
+
+.modal-content .table {
+  --bs-table-color: var(--app-text);
+  --bs-table-bg: #ffffff;
+  --bs-table-border-color: var(--app-border);
+  --bs-table-striped-color: var(--app-text);
+  --bs-table-striped-bg: #f8fafc;
+  --bs-table-hover-color: var(--app-text);
+  --bs-table-hover-bg: #eef4ff;
+  color: var(--app-text) !important;
+}
+
+.modal-content .table > :not(caption) > * > * {
+  color: var(--app-text);
+  background-color: transparent;
+}
+
+.modal-content .table thead th {
+  color: #263247;
+  background-color: #eef2f7;
+}
+
+.modal-content .text-secondary,
+.modal-content .text-body-secondary {
+  color: var(--app-text-muted) !important;
+}
+
+/*
+ * Ayrıntı pencereleri sayfa ana alanının dışında üretildiği için form
+ * bileşenleri de kendi açık tema renklerini açıkça alır. Böylece seçim
+ * kutusu, metin alanı ve etiketlerde beyaz üzerine beyaz yazı oluşmaz.
+ */
+.modal-content .form-label,
+.modal-content label,
+.modal-content legend,
+.modal-content .form-check-label {
+  color: var(--app-text);
+}
+
+.modal-content .form-control,
+.modal-content .form-select,
+.modal-content .input-group-text {
+  color: var(--app-text);
+  background-color: #ffffff;
+  border-color: var(--app-border);
+}
+
+.modal-content .form-control::placeholder {
+  color: #8a96a8;
+  opacity: 1;
+}
+
+.modal-content .form-control:disabled,
+.modal-content .form-select:disabled,
+.modal-content .form-control[readonly] {
+  color: #526071;
+  background-color: #eef2f7;
+}
+
+/* Açık bilgi kutuları koyu tema değişkenlerinden etkilenmez. */
+.app-main .alert-light,
+.modal-content .alert-light {
+  color: var(--app-text) !important;
+  background-color: #f8fafc !important;
+  border-color: var(--app-border) !important;
+}
+
+/* Sekme başlıklarında aktif ve pasif durumlar beyaz zeminde net kalır. */
+.app-main .nav-tabs .nav-link,
+.modal-content .nav-tabs .nav-link {
+  color: #475569;
+}
+
+.app-main .nav-tabs .nav-link:hover,
+.modal-content .nav-tabs .nav-link:hover {
+  color: var(--app-primary);
+}
+
+.app-main .nav-tabs .nav-link.active,
+.modal-content .nav-tabs .nav-link.active {
+  color: var(--app-primary-dark) !important;
+  background-color: #ffffff !important;
+  border-color: var(--app-border) var(--app-border) #ffffff !important;
+}
+
+.modal-header,
+.modal-footer {
+  background-color: #ffffff;
+  border-color: var(--app-border);
+}
+
+#settings-list pre,
+#operation-mode-summary {
+  color: #24324a !important;
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+#settings-list pre {
+  white-space: pre-wrap;
+}
+
+.app-footer {
+  color: #475569;
+  background-color: #ffffff;
+  border-top-color: var(--app-border);
+}
+
+/* AdminLTE varsayılan kenar çubuğu genişliği İETT menülerine uygun hâle getirilir. */
+.app-sidebar {
+  --lte-sidebar-width: 260px;
+}
+
+/* Koyu kurumsal zemin menü metinleriyle yüksek kontrast oluşturarak okunabilirliği artırır. */
+.sidebar-iett {
+  background: linear-gradient(180deg, var(--app-sidebar) 0%, #0b1120 100%);
+  color: #fff;
+}
+
+/* Logo alanı üst navigasyonla aynı görsel yüksekliğe yaklaştırılır. */
+.sidebar-brand {
+  min-height: 58px;
+  border-color: rgb(255 255 255 / 12%) !important;
+  background-color: rgb(0 0 0 / 12%);
+}
+
+/* Resmî İETT amblemi marka yazısının yanında küçük ve dengeli görünür. Kaynak
+   görseldeki beyaz çevre boşluğu kapsayıcıyla kırpılarak menü genişliği korunur. */
+.sidebar-brand .brand-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.sidebar-official-logo {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 50px;
+  overflow: hidden;
+}
+
+.sidebar-official-logo img {
+  position: absolute;
+  top: -22px;
+  left: -13px;
+  width: 55px;
+  max-width: none;
+  height: auto;
+}
+
+/* Marka adındaki AYS bölümü sakin mavi tonla vurgulanarak menüyle bütünleşir. */
+.brand-accent {
+  color: #60a5fa;
+}
+
+/* Normal menü bağlantıları koyu zeminde net beyaz-gri tonuyla gösterilir. */
+.sidebar-iett .sidebar-menu .nav-link {
+  color: #e9eef3;
+  margin: 0.18rem 0.6rem;
+  border-radius: 0.45rem;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+/* Fareyle üzerine gelinen bağlantı, aktif sayfayla karışmadan belirginleşir. */
+.sidebar-iett .sidebar-menu .nav-link:hover {
+  color: #fff;
+  background-color: var(--app-sidebar-hover);
+  transform: translateX(2px);
+}
+
+/* Bölüm başlıkları bağlantılardan ayrılması için küçük, soluk ve harf aralıklı yazılır. */
+.sidebar-iett .nav-header {
+  color: var(--app-sidebar-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding-inline: 1.25rem;
+}
+
+/* Kullanıcının bulunduğu sayfa, hata rengiyle karışmayan ana mavi tonla belirginleştirilir. */
+.sidebar-iett .sidebar-menu .nav-link.active {
+  background: linear-gradient(90deg, var(--app-primary-dark), var(--app-primary));
+  color: #fff;
+  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 22%);
+}
+
+/* Menü ikonları metinden kopmadan aynı hizada ve yeterli kontrastta tutulur. */
+.sidebar-iett .nav-icon {
+  color: #cbd5df;
+}
+
+.sidebar-iett .nav-link.active .nav-icon,
+.sidebar-iett .nav-link:hover .nav-icon {
+  color: #fff;
+}
+
+/* Giriş ekranında lacivert tanıtım alanı ile temiz beyaz form yüzeyi dengelenir. */
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background:
+    radial-gradient(circle at 8% 12%, rgb(37 99 235 / 12%), transparent 28rem),
+    linear-gradient(135deg, #eef4ff 0%, #f8fafc 48%, #eaf1fb 100%);
+}
+
+.login-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(25rem, 0.92fr);
+  width: min(1100px, 100%);
+  min-height: min(690px, calc(100vh - 4rem));
+  overflow: hidden;
+  border: 1px solid rgb(148 163 184 / 24%);
+  border-radius: 1.5rem;
+  background: #ffffff;
+  box-shadow: 0 1.8rem 4rem rgb(15 23 42 / 18%);
+}
+
+.login-showcase {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: clamp(2.4rem, 5vw, 4.5rem);
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 92% 15%, rgb(96 165 250 / 32%), transparent 18rem),
+    radial-gradient(circle at 8% 92%, rgb(37 99 235 / 25%), transparent 18rem),
+    linear-gradient(145deg, #0f1b31 0%, #111f3a 55%, #172b4d 100%);
+}
+
+/* Dekoratif halka, görsel eklemeden ulaşım/bağlantı hissi verir. */
+.login-showcase::after {
+  position: absolute;
+  right: -8rem;
+  bottom: -9rem;
+  width: 25rem;
+  height: 25rem;
+  border: 1px solid rgb(147 197 253 / 18%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3.5rem rgb(96 165 250 / 5%), 0 0 0 7rem rgb(96 165 250 / 4%);
+  content: '';
+}
+
+.login-brand-mark {
+  display: grid;
+  width: 4.2rem;
+  height: 4.2rem;
+  margin-bottom: 2rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 10%);
+  color: #93c5fd;
+  font-size: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.login-eyebrow,
+.login-form-eyebrow {
+  margin-bottom: 0.65rem;
+  color: #93c5fd;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.login-showcase h1 {
+  max-width: 32rem;
+  margin-bottom: 1rem;
+  font-size: clamp(2.25rem, 4.5vw, 3.7rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.login-intro {
+  max-width: 33rem;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 1.06rem;
+  line-height: 1.75;
+}
+
+.login-feature-list {
+  z-index: 1;
+  display: grid;
+  gap: 1.15rem;
+  margin-block: 3rem;
+}
+
+.login-feature {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.login-feature > span {
+  display: grid;
+  flex: 0 0 2.7rem;
+  width: 2.7rem;
+  height: 2.7rem;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: rgb(59 130 246 / 17%);
+  color: #93c5fd;
+  font-size: 1.2rem;
+}
+
+.login-feature strong,
+.login-feature small {
+  display: block;
+}
+
+.login-feature strong {
+  margin-bottom: 0.2rem;
+}
+
+.login-feature small,
+.login-showcase-footer {
+  color: #aebbd0;
+}
+
+.login-showcase-footer {
+  z-index: 1;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.login-form-panel {
+  display: grid;
+  place-items: center;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  background: #ffffff;
+}
+
+.login-form-content {
+  width: min(400px, 100%);
+}
+
+/* Resmî PDF'den alınan yüksek çözünürlüklü amblemin çevresindeki beyaz sayfa
+   boşluğu CSS ile kırpılır; kaynak görselin oranı ve logo biçimi değiştirilmez. */
+.login-official-logo {
+  position: relative;
+  width: 58px;
+  height: 118px;
+  margin-bottom: 1.35rem;
+  overflow: hidden;
+}
+
+.login-official-logo img {
+  position: absolute;
+  top: -32px;
+  left: -26px;
+  width: 109px;
+  max-width: none;
+  height: auto;
+}
+
+.login-form-eyebrow {
+  color: var(--app-primary);
+}
+
+.login-form-content h2 {
+  margin-bottom: 0.65rem;
+  color: #172033;
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.login-form-description {
+  margin-bottom: 1.25rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Giriş, ilk parola oluşturma ve parola değiştirme aynı kartta sekmeli olarak sunulur. */
+.login-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.3rem;
+  margin-bottom: 1.5rem;
+  padding: 0.3rem;
+  border-radius: 0.8rem;
+  background: #eef2f7;
+}
+
+.login-mode-button {
+  min-height: 2.55rem;
+  padding: 0.45rem 0.35rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.login-mode-button:hover {
+  color: #1d4ed8;
+}
+
+.login-mode-button.active {
+  background: #ffffff;
+  color: #1d4ed8;
+  box-shadow: 0 0.2rem 0.65rem rgb(15 23 42 / 10%);
+}
+
+.login-form-content .form-label {
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.login-input-wrap {
+  position: relative;
+}
+
+.login-input-wrap > i {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 1rem;
+  color: #64748b;
+  transform: translateY(-50%);
+}
+
+.login-input-wrap .form-control {
+  min-height: 3.25rem;
+  padding-left: 2.8rem;
+  color: #172033;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  border-radius: 0.75rem;
+}
+
+.login-input-wrap .form-control:focus {
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.22rem rgb(37 99 235 / 13%);
+}
+
+.login-submit {
+  min-height: 3.25rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+  font-weight: 700;
+  box-shadow: 0 0.65rem 1.25rem rgb(37 99 235 / 22%);
+}
+
+.login-submit:hover,
+.login-submit:focus {
+  background: linear-gradient(90deg, #1e40af, #1d4ed8);
+}
+
+.login-access-note {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #dbeafe;
+  border-radius: 0.75rem;
+  background: #eff6ff;
+  color: #475569;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.login-access-note i {
+  color: #2563eb;
+}
+
+.login-copyright {
+  margin: 1.5rem 0 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+@media (max-width: 850px) {
+  .login-page {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .login-shell {
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .login-showcase {
+    display: none;
+  }
+
+  .login-form-panel {
+    padding: 2rem 1.25rem;
+  }
+
+  .login-official-logo {
+    margin-bottom: 1.75rem;
+  }
+}
+
+/* Dashboard bilgi kutularındaki ana sayılar görsel hiyerarşide öne çıkarılır. */
+.info-box {
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.7rem;
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+/* Kartın üzerine gelindiğinde küçük hareket, tıklanabilirlik hissi vermeden bölümü canlandırır. */
+.info-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.55rem 1.2rem rgb(16 24 32 / 10%) !important;
+}
+
+/* Renkli ikon alanı ile beyaz veri alanı arasındaki görsel ayrım güçlendirilir. */
+.info-box .info-box-icon {
+  width: 4.4rem;
+  font-size: 1.55rem;
+}
+
+.info-box-number {
+  font-size: 1.4rem;
+  color: var(--bs-body-color);
+}
+
+/* Kart başlıkları sayılardan daha sakin bir renkte gösterilir. */
+.info-box-text {
+  color: var(--bs-secondary-color);
+  font-weight: 600;
+}
+
+/* İçerik kartları beyaz zemin ve yumuşak köşelerle koyu menüden görsel olarak ayrılır. */
+.card {
+  border-color: var(--bs-border-color-translucent);
+  border-radius: 0.7rem;
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom-color: var(--bs-border-color-translucent);
+}
+
+/* Dashboard modül kartları sistem kapsamını kalabalıklaştırmadan taranabilir bir ızgarada gösterir. */
+.module-card {
+  border: 1px solid var(--bs-border-color-translucent);
+  background-color: #fff;
+  color: inherit;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+/* Yalnızca bağlantı olan hazır modüller hover sırasında etkileşimli görünür. */
+a.module-card:hover {
+  border-color: rgb(37 99 235 / 45%);
+  transform: translateY(-2px);
+  box-shadow: 0 0.55rem 1.2rem rgb(16 24 32 / 9%);
+}
+
+/* Her modülün ikonu ortak mavi yüzey içinde aynı ölçüde sunulur. */
+.module-card-icon {
+  display: grid;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background-color: #eff6ff;
+  color: var(--app-primary);
+  font-size: 1.25rem;
+}
+
+/* Uzayan ortak menüde scrollbar görünür ve modüller ekran dışında kaybolmaz. */
+.sidebar-wrapper {
+  overflow-y: auto;
+}
+
+/* Chart.js canvas elemanlarının hesaplayabileceği kararlı bir çizim alanı oluşturulur. */
+.chart-container {
+  position: relative;
+  min-height: 360px;
+}
+
+/* Halka grafik geniş ekranlarda gereksiz büyümeden ortalanır. */
+.chart-container-small {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+/* Tablo başlıklarının iki satıra bölünüp okunabilirliği bozması engellenir. */
+.table th {
+  white-space: nowrap;
+}
+
+/* Arıza detayındaki yaşam döngüsü geniş ekranda yatay, telefonda dikey okunur. */
+.fault-lifecycle {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(7rem, 1fr));
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.fault-lifecycle-step {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.35rem;
+  color: var(--bs-secondary-color);
+  text-align: center;
+}
+
+/* Aşamalar arasındaki çizgi sürecin devamlılığını gösterir. */
+.fault-lifecycle-step:not(:last-child)::after {
+  position: absolute;
+  z-index: 0;
+  top: 1.25rem;
+  left: calc(50% + 1.25rem);
+  width: calc(100% - 2.5rem);
+  height: 0.2rem;
+  border-radius: 1rem;
+  background: #dbe3ec;
+  content: '';
+}
+
+.fault-lifecycle-icon {
+  z-index: 1;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.fault-lifecycle-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.fault-lifecycle-step.is-completed {
+  color: #15803d;
+}
+
+.fault-lifecycle-step.is-completed .fault-lifecycle-icon,
+.fault-lifecycle-step.is-active .fault-lifecycle-icon {
+  border-color: #16a34a;
+  background: #dcfce7;
+}
+
+.fault-lifecycle-step.is-completed:not(:last-child)::after {
+  background: #86efac;
+}
+
+.fault-lifecycle-step.is-active {
+  color: var(--app-primary);
+}
+
+.fault-lifecycle-step.is-active .fault-lifecycle-icon {
+  border-color: var(--app-primary);
+  background: #dbeafe;
+  box-shadow: 0 0 0 0.25rem rgb(37 99 235 / 12%);
+}
+
+/* Küçük telefonlarda üst menü yazısı taşmayı azaltmak için küçültülür. */
+@media (max-width: 575.98px) {
+  .navbar-text {
+    font-size: 0.85rem;
+  }
+
+  .fault-lifecycle {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .fault-lifecycle-step {
+    grid-template-columns: 2.5rem 1fr;
+    justify-items: start;
+    align-items: center;
+    text-align: left;
+  }
+
+  .fault-lifecycle-step:not(:last-child)::after {
+    top: 2.5rem;
+    left: 1.15rem;
+    width: 0.2rem;
+    height: 0.9rem;
+  }
+}
+
+/* Garaj kartlarında renkli ikon, doluluk seviyesini metni okumadan da fark edilir kılar. */
+.garage-icon {
+  display: grid;
+  flex: 0 0 2.7rem;
+  width: 2.7rem;
+  height: 2.7rem;
+  place-items: center;
+  border-radius: 0.65rem;
+  font-size: 1.2rem;
+}
+
+/* İnce doluluk çubuğu kartı kalabalıklaştırmadan kapasite seviyesini görselleştirir. */
+.garage-progress {
+  height: 0.65rem;
+}
+
+/* Garaj kartının semantik kenarlığı hover sırasında korunarak detay düğmesine yönelim sağlanır. */
+.garage-card {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.garage-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.35rem rgb(16 24 32 / 10%) !important;
+}
+/* Sistem Ayarları sayfasındaki sekmeler ve özet bileşenleri açık içerik alanında
+   yönetim ekranı hissi verir; koyu yan menüyle görsel ayrımı korur. */
+.settings-tabs {
+  padding: .5rem;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: .9rem;
+  box-shadow: 0 .25rem .75rem rgba(15, 23, 42, .06);
+}
+
+.settings-tabs .nav-link {
+  color: #475569;
+  border-radius: .65rem;
+  font-weight: 600;
+  padding: .7rem 1rem;
+}
+
+.settings-tabs .nav-link.active {
+  color: #fff;
+  background: #2563eb;
+  box-shadow: 0 .25rem .6rem rgba(37, 99, 235, .25);
+}
+
+.settings-icon,
+.settings-icon-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: .75rem;
+}
+
+.settings-icon { width: 3rem; height: 3rem; font-size: 1.25rem; }
+.settings-icon-sm { width: 2.5rem; height: 2.5rem; color: #2563eb; }
+
+.setting-control {
+  min-height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: .75rem;
+  background: #f8fafc;
+}
+
+@media (max-width: 767.98px) {
+  .settings-tabs .nav-item { flex: 1 1 calc(50% - .5rem); }
+  .settings-tabs .nav-link { width: 100%; }
+}
+/* Bootstrap'te hazır turuncu rozet bulunmadığı için araç sağlık puanlarının
+   30-49 aralığını sarı ve kırmızıdan ayıran erişilebilir özel renk kullanılır. */
+.text-bg-orange {
+  color: #fff !important;
+  background-color: #f97316 !important;
+}

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="İETT günlük görev ve hat planı" />
+    <title>Görev ve Hat Planı | İETT Arıza Yönetim Sistemi</title>
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <!-- AdminLTE uygulama iskeleti bütün operasyon sayfalarında ortak kullanılır. -->
+    <div class="app-wrapper">
+      <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+        <div class="container-fluid">
+          <button class="btn btn-link nav-link" type="button" data-lte-toggle="sidebar" aria-label="Menüyü aç veya kapat"><i class="bi bi-list fs-4"></i></button>
+          <span class="navbar-text ms-2 fw-semibold">İETT Arıza Yönetim Sistemi</span>
+          <div class="ms-auto d-flex align-items-center gap-3"><span class="text-secondary small" id="current-user">Oturum doğrulanıyor…</span><button class="btn btn-outline-danger btn-sm" id="logout-button" type="button">Çıkış</button></div>
+        </div>
+      </nav>
+
+      <!-- Ortak navigasyon JavaScript tarafından rol ve aktif sayfaya göre doldurulur. -->
+      <aside class="app-sidebar sidebar-iett shadow" data-bs-theme="dark">
+        <div class="sidebar-brand border-bottom"><a href="./index.html" class="brand-link text-decoration-none"><span class="brand-text fw-bold text-white">İETT <span class="brand-accent">AYS</span></span></a></div>
+        <div class="sidebar-wrapper"><nav class="mt-2"><ul class="nav sidebar-menu flex-column" id="application-navigation" data-lte-toggle="treeview" role="menu"></ul></nav></div>
+      </aside>
+
+      <main class="app-main">
+        <div class="app-content-header"><div class="container-fluid py-3"><h1 class="mb-1">Görev ve Hat Planı</h1><p class="text-secondary mb-0">Hatların günlük araç, sürücü ve gidiş-dönüş görevleri</p></div></div>
+        <div class="app-content"><div class="container-fluid">
+          <div id="tasks-error" class="alert alert-danger d-none" role="alert"></div>
+
+          <!-- Tarih ve hat filtresi backend görev sorgusunun kapsamını belirler. -->
+          <div class="card shadow-sm mb-4"><div class="card-body"><form id="task-filter-form" class="row g-3 align-items-end">
+            <div class="col-12 col-md-5"><label class="form-label" for="task-date">Görev tarihi</label><input class="form-control" id="task-date" type="date" required /></div>
+            <div class="col-12 col-md-5"><label class="form-label" for="task-route">Hat</label><select class="form-select" id="task-route"><option value="">Tüm hatlar</option></select></div>
+            <div class="col-12 col-md-2 d-grid"><button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filtrele</button></div>
+          </form></div></div>
+
+          <!-- Günlük görevlerin toplam ve durum dağılımını hızlı okunabilir kartlarla özetler. -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-xl-3"><div class="task-summary-card card h-100"><div class="card-body"><div class="small text-secondary">Toplam görev</div><div class="fs-3 fw-bold" id="task-total">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="task-summary-card card h-100 border-primary"><div class="card-body"><div class="small text-secondary">Planlı</div><div class="fs-3 fw-bold text-primary" id="task-planned">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="task-summary-card card h-100 border-warning"><div class="card-body"><div class="small text-secondary">Aktif / Seferde</div><div class="fs-3 fw-bold text-warning-emphasis" id="task-active">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="task-summary-card card h-100 border-success"><div class="card-body"><div class="small text-secondary">Tamamlandı</div><div class="fs-3 fw-bold text-success" id="task-completed">0</div></div></div></div>
+          </div>
+
+          <!-- Görev satırları gerçek API cevabından JavaScript ile oluşturulur. -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex align-items-center"><h2 class="card-title mb-0">Günlük Görevler</h2><span class="badge text-bg-secondary ms-auto" id="task-count">0 kayıt</span></div>
+            <div id="tasks-loading" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor</span></div></div>
+            <div id="tasks-table-container" class="table-responsive d-none"><table class="table table-striped table-hover align-middle mb-0">
+              <thead><tr><th>Görev No</th><th>Hat</th><th>Sıra</th><th>Planlanan Saat</th><th>Gerçekleşen Saat</th><th>Araç</th><th>Sürücü</th><th>Atama</th><th>Durum</th><th></th></tr></thead>
+              <tbody id="tasks-body"></tbody>
+            </table></div>
+          </div>
+        </div></div>
+      </main>
+      <footer class="app-footer"><span class="float-end d-none d-sm-inline">MG</span><strong>© 2026 İETT Arıza Yönetim Sistemi</strong></footer>
+    </div>
+
+    <!-- Görev planı ve araç/sürücü değişiklik geçmişi Bootstrap modalında gösterilir. -->
+    <div class="modal fade" id="task-detail-modal" tabindex="-1" aria-labelledby="task-detail-title" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5" id="task-detail-title">Görev Detayı</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+      <div class="modal-body" id="task-detail-content"></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button></div>
+    </div></div></div>
+
+    <!-- Görev sayfasının oturum, filtre, liste ve detay işlemlerini başlatır. -->
+    <script type="module" src="/src/pages/tasks.js"></script>
+  </body>
+</html>

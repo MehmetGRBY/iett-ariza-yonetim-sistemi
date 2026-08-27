@@ -1,0 +1,26 @@
+@host = http://localhost:5043
+@token = TOKEN_BURAYA
+
+### Veritabanı sağlık kontrolü
+GET {{host}}/api/system/database-health
+
+### JWT giriş
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "personnelNumber": "ADM-0001",
+  "password": "YEREL_TEST_PAROLANIZ"
+}
+
+### Araçlar
+GET {{host}}/api/vehicles?page=1&pageSize=100
+Authorization: Bearer {{token}}
+
+### Dashboard
+GET {{host}}/api/dashboard
+Authorization: Bearer {{token}}
+
+### Arızalar
+GET {{host}}/api/faults?page=1&pageSize=100
+Authorization: Bearer {{token}}

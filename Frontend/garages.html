@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="İETT garaj kapasite, araç ve personel takibi" />
+    <title>Garajlar | İETT Arıza Yönetim Sistemi</title>
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <!-- AdminLTE iskeleti diğer operasyon sayfalarıyla aynı kullanıcı deneyimini sağlar. -->
+    <div class="app-wrapper">
+      <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+        <div class="container-fluid">
+          <button class="btn btn-link nav-link" type="button" data-lte-toggle="sidebar" aria-label="Menüyü aç veya kapat"><i class="bi bi-list fs-4"></i></button>
+          <span class="navbar-text ms-2 fw-semibold">İETT Arıza Yönetim Sistemi</span>
+          <div class="ms-auto d-flex align-items-center gap-3"><span class="text-secondary small" id="current-user">Oturum doğrulanıyor…</span><button class="btn btn-outline-danger btn-sm" id="logout-button" type="button">Çıkış</button></div>
+        </div>
+      </nav>
+      <aside class="app-sidebar sidebar-iett shadow" data-bs-theme="dark">
+        <div class="sidebar-brand border-bottom"><a href="./index.html" class="brand-link text-decoration-none"><span class="brand-text fw-bold text-white">İETT <span class="brand-accent">AYS</span></span></a></div>
+        <div class="sidebar-wrapper"><nav class="mt-2"><ul class="nav sidebar-menu flex-column" id="application-navigation" data-lte-toggle="treeview" role="menu"></ul></nav></div>
+      </aside>
+
+      <main class="app-main">
+        <div class="app-content-header"><div class="container-fluid py-3"><h1 class="mb-1">Garaj Yönetimi</h1><p class="text-secondary mb-0">Fiziksel kapasite, araç dağılımı, sürücüler ve teknik ekipler</p></div></div>
+        <div class="app-content"><div class="container-fluid">
+          <div id="garages-error" class="alert alert-danger d-none" role="alert"></div>
+
+          <!-- Filtreler, çok sayıdaki garaj arasında ad/kod ve doluluk durumuyla hızlı arama sağlar. -->
+          <div class="card shadow-sm mb-4"><div class="card-body"><form id="garage-filter-form" class="row g-3 align-items-end">
+            <div class="col-12 col-md-8"><label class="form-label" for="garage-search">Garaj ara</label><input class="form-control" id="garage-search" placeholder="Garaj adı veya kodu" /></div>
+            <div class="col-12 col-md-4"><label class="form-label" for="occupancy-filter">Doluluk durumu</label><select class="form-select" id="occupancy-filter"><option value="">Tümü</option><option value="green">%60 altı</option><option value="yellow">%60–85</option><option value="red">%85 ve üzeri</option></select></div>
+          </form></div></div>
+
+          <!-- Özet kartları görünür garajların toplam kapasite ve personel bilgisini sunar. -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-secondary">Garaj</div><div class="fs-3 fw-bold" id="garage-total">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-secondary">Toplam araç</div><div class="fs-3 fw-bold text-primary" id="vehicle-total">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-secondary">Boş kapasite</div><div class="fs-3 fw-bold text-success" id="capacity-total">0</div></div></div></div>
+            <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-secondary">Aktif teknisyen</div><div class="fs-3 fw-bold text-info" id="technician-total">0</div></div></div></div>
+          </div>
+
+          <div id="garages-loading" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor</span></div></div>
+          <!-- Kart düzeni her garajın doluluk seviyesini masaüstü ve mobilde okunabilir gösterir. -->
+          <div class="row g-4 d-none" id="garage-grid"></div>
+        </div></div>
+      </main>
+      <footer class="app-footer"><span class="float-end d-none d-sm-inline">MG</span><strong>© 2026 İETT Arıza Yönetim Sistemi</strong></footer>
+    </div>
+
+    <!-- Araç durumları ve ekip üyeleri geniş modal içerisinde ayrıntılı gösterilir. -->
+    <div class="modal fade" id="garage-detail-modal" tabindex="-1" aria-labelledby="garage-detail-title" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5" id="garage-detail-title">Garaj Detayı</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button></div>
+      <div class="modal-body" id="garage-detail-content"></div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline-primary d-none" id="garage-edit-button">Düzenle</button><button type="button" class="btn btn-outline-danger d-none" id="garage-active-button">Pasife Al</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button></div>
+    </div></div></div>
+    <!-- Garaj kodu sicil yapısında kullanıldığı için değiştirilmez; diğer alanlar Admin tarafından yönetilir. -->
+    <div class="modal fade" id="garage-edit-modal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><form id="garage-edit-form" class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5">Garaj Bilgilerini Düzenle</h2><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><input id="edit-garage-id" type="hidden" /><div class="row g-3">
+        <div class="col-12"><label class="form-label">Garaj kodu</label><input id="edit-garage-code" class="form-control" disabled /></div>
+        <div class="col-12"><label class="form-label">Garaj adı</label><input id="edit-garage-name" class="form-control" maxlength="150" required /></div>
+        <div class="col-12"><label class="form-label">Adres</label><textarea id="edit-garage-address" class="form-control" maxlength="500"></textarea></div>
+        <div class="col-12"><label class="form-label">Araç kapasitesi</label><input id="edit-garage-capacity" class="form-control" type="number" min="1" required /><div id="garage-capacity-help" class="form-text"></div></div>
+      </div></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button><button type="submit" class="btn btn-primary">Kaydet</button></div>
+    </form></div></div>
+    <script type="module" src="/src/pages/garages.js"></script>
+  </body>
+</html>
